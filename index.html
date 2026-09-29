@@ -125,12 +125,37 @@
   }
   .cert-card a:hover{ background:var(--gold); transform:translateX(2px); }
 
+  body.pdf-open{ overflow:hidden; }
+  body.pdf-open .shell{ visibility:hidden; opacity:0; pointer-events:none; }
+
+  .pdf-modal{ position:fixed; inset:0; background:rgba(12,16,20,0.78); display:none; align-items:center; justify-content:center; padding:20px; z-index:50; }
+  .pdf-modal.active{ display:flex; }
+  .pdf-modal-inner{ position:relative; width:min(100vw - 32px, 1200px); height:min(92vh, 870px); background:var(--paper); border:1px solid var(--rule); border-radius:16px; overflow:hidden; box-shadow:0 26px 60px rgba(0,0,0,0.28); }
+  .pdf-modal-header{ display:flex; align-items:center; justify-content:space-between; padding:12px 16px; border-bottom:1px solid var(--rule); background:rgba(255,255,255,0.7); }
+  .pdf-modal-header h3{ font-size:16px; color:var(--ink); }
+  .pdf-close{ background:transparent; color:var(--ink); border:1px solid var(--rule); width:34px; height:34px; border-radius:50%; cursor:pointer; font-size:20px; }
+  .pdf-frame{ width:100%; height:calc(100% - 58px); border:0; background:#fff; }
+
+  .side-contact{ margin-top:16px; font-size:13px; color:var(--muted); display:flex; flex-direction:column; gap:6px; }
+  .side-contact span{ display:inline-flex; align-items:center; gap:8px; }
+  .side-contact span::before{ content:""; width:7px; height:7px; border-radius:50%; background:var(--gold); display:inline-block; }
+
   .contact-card{
-    background:var(--card); border:1px solid var(--rule); border-radius:10px; padding:22px; max-width:420px;
+    background:var(--card); border:1px solid var(--rule); border-radius:12px; padding:18px; max-width:480px;
+    box-shadow:0 10px 24px rgba(23,30,38,0.03);
   }
-  .contact-card a{ color:var(--teal); text-decoration:none; border-bottom:1px solid var(--teal); }
+  .contact-list{ display:grid; gap:12px; }
+  .contact-item{
+    display:flex; align-items:center; gap:14px; padding:12px 14px; border:1px solid var(--rule);
+    background:color-mix(in srgb, var(--panel) 70%, transparent); border-radius:10px;
+  }
+  .contact-item .label{
+    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--gold); min-width:62px;
+  }
+  .contact-card a{ color:var(--teal); text-decoration:none; border-bottom:1px solid transparent; transition:color 0.2s ease, border-color 0.2s ease; }
   .contact-card a:hover{ color:var(--gold); border-color:var(--gold); }
-  .contact-card .lang{ margin-top:14px; font-size:13.5px; color:var(--muted); }
+  .contact-card .lang{ margin-top:16px; font-size:13.5px; color:var(--muted); }
 
   /* ---------- Responsive ---------- */
   @media (max-width:760px){
@@ -167,7 +192,10 @@
         Download CV
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="M6 11l6 6 6-6"/><path d="M4 21h16"/></svg>
       </a>
-      <div class="side-contact">Abu Dhabi, UAE · Manipal University Jaipur</div>
+      <div class="side-contact">
+        <span>India · +91 89511 16881</span>
+        <span>UAE · +971 52 824 4883</span>
+      </div>
     </div>
   </aside>
 
@@ -215,22 +243,45 @@
       <h2>Certifications</h2>
       <div class="cert-card">
         <span>Foundations of Cybersecurity</span>
-        <a href="Foundation%20of%20cybersecurity%20certificate.pdf" target="_blank" rel="noopener">View PDF →</a>
+        <a href="Foundation%20of%20cybersecurity%20certificate.pdf" class="pdf-open" data-pdf="Foundation%20of%20cybersecurity%20certificate.pdf" data-title="Foundations of Cybersecurity">View PDF →</a>
       </div>
       <div class="cert-card">
         <span>Foundations of Data Everywhere</span>
-        <a href="foundation%20data%20everywhere.pdf" target="_blank" rel="noopener">View PDF →</a>
+        <a href="foundation%20data%20everywhere.pdf" class="pdf-open" data-pdf="foundation%20data%20everywhere.pdf" data-title="Foundations of Data Everywhere">View PDF →</a>
       </div>
     </section>
 
     <section id="contact" class="panel">
       <h2>Get in touch</h2>
       <div class="contact-card">
-        <a href="mailto:rumanasultana111@gmail.com">rumanasultana111@gmail.com</a>
+        <div class="contact-list">
+          <div class="contact-item">
+            <span class="label">Email</span>
+            <a href="mailto:rumanasultana111@gmail.com">rumanasultana111@gmail.com</a>
+          </div>
+          <div class="contact-item">
+            <span class="label">India</span>
+            <a href="tel:+918951116881">+91 89511 16881</a>
+          </div>
+          <div class="contact-item">
+            <span class="label">UAE</span>
+            <a href="tel:+971528244883">+971 52 824 4883</a>
+          </div>
+        </div>
         <div class="lang">Languages: English, Hindi, Kannada, Urdu</div>
       </div>
     </section>
   </main>
+</div>
+
+<div class="pdf-modal" id="pdfModal" aria-hidden="true">
+  <div class="pdf-modal-inner" role="dialog" aria-modal="true" aria-labelledby="pdfTitle">
+    <div class="pdf-modal-header">
+      <h3 id="pdfTitle">Certificate</h3>
+      <button class="pdf-close" aria-label="Close dialog">×</button>
+    </div>
+    <iframe class="pdf-frame" id="pdfFrame" title="Certificate preview" src=""></iframe>
+  </div>
 </div>
 
 <script>
@@ -252,6 +303,43 @@
     const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     root.setAttribute('data-theme', next);
     try { localStorage.setItem('theme', next); } catch(e) {}
+  });
+
+  const pdfModal = document.getElementById('pdfModal');
+  const pdfFrame = document.getElementById('pdfFrame');
+  const pdfTitle = document.getElementById('pdfTitle');
+  const modalClose = document.querySelector('.pdf-close');
+
+  document.querySelectorAll('.pdf-open').forEach(link => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      const pdf = link.dataset.pdf;
+      const title = link.dataset.title;
+      openPdfModal(pdf, title);
+    });
+  });
+
+  function closePdfModal() {
+    pdfModal.classList.remove('active');
+    pdfModal.setAttribute('aria-hidden', 'true');
+    pdfFrame.src = '';
+    document.body.classList.remove('pdf-open');
+  }
+
+  function openPdfModal(pdf, title) {
+    pdfTitle.textContent = title;
+    pdfFrame.src = pdf;
+    pdfModal.classList.add('active');
+    pdfModal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('pdf-open');
+  }
+
+  modalClose.addEventListener('click', closePdfModal);
+  pdfModal.addEventListener('click', (event) => {
+    if (event.target === pdfModal) closePdfModal();
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && pdfModal.classList.contains('active')) closePdfModal();
   });
 
   // wheel-scroll navigates between panels (desktop app-shell layout only)
